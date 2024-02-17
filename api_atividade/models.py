@@ -18,7 +18,7 @@ class Pessoas(base):
     __tablename__ = 'pessoas'
     id = Column(Integer, primary_key = True)
     name = Column(String(40), index = True)
-    age = Column(Integer)
+    age = Column(Integer) 
     
     def __repr__(self):
         return '<Pessoa {}>'.format(self.name)
