@@ -6,13 +6,33 @@ from flask_restful import Resource
 
 from flask_restful import Api
 
+from flask_httpauth import HTTPBasicAuth
+
 from models import Pessoas
 
 from models import Atividades
 
+from models import Usuarios
+
+auth = HTTPBasicAuth()
+
 app = Flask(__name__)
 
 api = Api(app)
+
+USUARIOS = {
+    'victor' : '1234',
+    'rafael' : '1234',
+    'brito' : '040506'
+}
+
+@auth.verify_password()
+def check(login, password):
+    if not (login,password):
+        return False
+    
+    return Usuarios.query.filter_by(login = login, password = password, status = True).first()
+    
 
 class Pessoa(Resource):
     
@@ -35,6 +55,7 @@ class Pessoa(Resource):
             
         return response
     
+    @auth.login_required()
     def put(self, name):
         
         pessoa = Pessoas.query.filter_by(name=name).first()
@@ -59,6 +80,7 @@ class Pessoa(Resource):
         
         return response
 
+    @auth.login_required()
     def delete(self, name):
         
         pessoa = Pessoas.query.filter_by(name=name).first()
@@ -70,9 +92,6 @@ class Pessoa(Resource):
         }
         
         return response
-    
-    def post(self):
-        pass 
 
 class ListaPessoas(Resource):
     
@@ -84,6 +103,7 @@ class ListaPessoas(Resource):
         
         return response
 
+    @auth.login_required()
     def post(self):
         
         dados = request.json
@@ -101,6 +121,7 @@ class ListaPessoas(Resource):
         return response
     
 class ListaAtividades(Resource):
+    
     def get(self):
         
         atividades = Atividades.query.all()
@@ -109,6 +130,7 @@ class ListaAtividades(Resource):
         
         return response
     
+    @auth.login_required()
     def post(self):
         
         dados = request.json
